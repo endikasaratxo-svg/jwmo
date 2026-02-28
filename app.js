@@ -1,109 +1,44 @@
-// === IMPORTAR BACKUP JSON (CORREGIDO PARA GITHUB) ===
+// === IMPORTAR BACKUP JSON (CORREGIDO) ===
 function setupJsonImportTest() {
-    let hiddenInput = document.getElementById('agImportJsonHidden');
-    
-    if (!hiddenInput) {
-        hiddenInput = document.createElement('input');
-        hiddenInput.type = 'file';
-        hiddenInput.accept = '.json';
-        hiddenInput.style.display = 'none';
-        hiddenInput.id = 'agImportJsonHidden';
-        document.body.appendChild(hiddenInput);
-    }
+  let hiddenInput = document.getElementById('agImportJsonHidden');
+  
+  if (!hiddenInput) {
+    hiddenInput = document.createElement('input');
+    hiddenInput.type = 'file';
+    hiddenInput.accept = '.json';
+    hiddenInput.style.display = 'none';
+    hiddenInput.id = 'agImportJsonHidden';
+    document.body.appendChild(hiddenInput);
+  }
 
-    hiddenInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+  hiddenInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            try {
-                const json = JSON.parse(ev.target.result);
-                
-                // GUARDAR LOS DATOS EN LA MEMORIA DEL NAVEGADOR
-                // Usamos 'marbella_backup_data' o el nombre que prefieras
-                localStorage.setItem('marbella_data_backup', JSON.stringify(json));
-                
-                // Actualizamos la variable en tiempo real
-                appData = json;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const json = JSON.parse(ev.target.result);
+        
+        // GUARDAMOS EN LA MEMORIA DE LA APP (appData) Y EN EL NAVEGADOR (localStorage)
+        localStorage.setItem('marbella_data_backup', JSON.stringify(json));
+        appData = json;
 
-                alert('¡IMPORTACIÓN CORRECTA! Los datos de Marbella se han cargado. La página se reiniciará.');
-                window.location.reload();
-
-            } catch (err) {
-                console.error('Error al parsear JSON:', err);
-                alert('Archivo JSON no válido.');
-            }
-        };
-        reader.readAsText(file, 'utf-8');
-    });
+        alert('¡Copia de seguridad cargada con éxito! La página se reiniciará.');
+        window.location.reload(); 
+      } catch (err) {
+        console.error('Error al importar:', err);
+        alert('El archivo JSON no es válido.');
+      }
+    };
+    reader.readAsText(file, 'utf-8');
+  });
 }
 
-// Esta función es la que debes llamar desde el botón de la web
+// Función para abrir el selector de archivos desde cualquier botón de tu menú
 function triggerImport() {
-    const input = document.getElementById('agImportJsonHidden');
-    if (input) {
-        input.click();
-    } else {
-        // Si aún no se ha creado el input, lo creamos primero
-        setupJsonImportTest();
-        document.getElementById('agImportJsonHidden').click();
-    }
-}
-
-    // Creamos un botón flotante de prueba para lanzar el input
-    const btn = document.createElement('button');
-    btn.textContent = 'IMPORTAR JSON (TEST)';
-    btn.style.position = 'fixed';
-    btn.style.bottom = '20px';
-    btn.style.right = '20px';
-    btn.style.zIndex = '999999';
-    btn.style.padding = '10px 15px';
-    btn.style.borderRadius = '10px';
-    btn.style.border = 'none';
-    btn.style.background = '#10b981';
-    btn.style.color = '#fff';
-    btn.style.fontWeight = '700';
-    btn.style.cursor = 'pointer';
-
-    btn.addEventListener('click', () => {
-        hiddenInput.click();
-    });
-
-    document.body.appendChild(btn);
-
-    function exportFullBackup() {
-  const dataStr = JSON.stringify(appData, null, 2);
-  const blob = new Blob([dataStr], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'jwmo-backup.json';
-  a.click();
-
-  URL.revokeObjectURL(url);
-}
-function setupJsonImportTest() {
-  // ... TU CÓDIGO ACTUAL ...
-  document.body.appendChild(btn);
-}
-
-// === EXPORTAR BACKUP JSON COMPLETO ===
-function exportFullBackup() {
-    if (!appData || Object.keys(appData.actualHours).length === 0) {
-        alert("No hay datos para exportar todavía.");
-        return;
-    }
-    const dataStr = JSON.stringify(appData, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `jwmo-backup-${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const input = document.getElementById('agImportJsonHidden') || setupJsonImportTest() || document.getElementById('agImportJsonHidden');
+    input.click();
 }
 
 // Llama a estas funciones cuando la app haya cargado (SOLO PARA PRUEBAS)
@@ -172,14 +107,17 @@ async function init() {
 
 async function loadBackupData() {
     try {
+        // Primero intentamos cargar tu copia guardada en el navegador
         const savedData = localStorage.getItem('marbella_data_backup');
         if (savedData) {
             appData = JSON.parse(savedData);
-            console.log("📦 Datos cargados desde LocalStorage");
+            console.log("📦 Datos cargados desde copia de seguridad local");
             applyBranding();
             determineCurrentServiceYear();
             return;
         }
+
+        // Si no hay copia, intentamos cargar el archivo por defecto
         const response = await fetch('marbella_backup.json');
         if (response.ok) {
             appData = await response.json();
@@ -2009,6 +1947,7 @@ function exportarJSON() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
 
 
 
