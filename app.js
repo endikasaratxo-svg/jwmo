@@ -1925,18 +1925,22 @@ function exportarJSON() {
 // ... (aquí termina tu última función original)
 
 function exportarJSON() {
-  if (!appData) return;
+  if (!appData) {
+    alert("⚠️ No hay datos para exportar.");
+    return;
+  }
   const dataStr = JSON.stringify(appData, null, 2);
   const blob = new Blob([dataStr], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `marbella-backup.json`;
+  a.download = `marbella-backup-${new Date().toISOString().slice(0,10)}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
-// ESTO ES LO MÁS IMPORTANTE PARA QUE NO SALGA EN BLANCO:
+// ESTA LÍNEA ES LA QUE QUITA EL AZUL Y ENCIENDE LA APP
 window.onload = init;
 
