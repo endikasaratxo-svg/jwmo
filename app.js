@@ -107,28 +107,23 @@ async function init() {
 
 async function loadBackupData() {
     try {
-        // 1. Intentamos cargar lo que tú hayas IMPORTADO manualmente (se guarda en la memoria del navegador)
+        // Miramos si hay datos guardados por ti
         const savedData = localStorage.getItem('marbella_data_backup');
-        
         if (savedData) {
             appData = JSON.parse(savedData);
-            console.log("📦 Datos cargados desde la memoria del navegador");
             applyBranding();
             determineCurrentServiceYear();
-            return; // Si encontramos esto, ya no seguimos buscando
+            return;
         }
-
-        // 2. Si no hay nada en memoria, buscamos el archivo del servidor
+        // Si no, buscamos el archivo normal
         const response = await fetch('marbella_backup.json');
         if (response.ok) {
             appData = await response.json();
             applyBranding();
             determineCurrentServiceYear();
-        } else {
-            console.log("No hay archivo marbella_backup.json en el servidor.");
         }
     } catch (e) {
-        console.error("❌ Error al cargar datos:", e);
+        console.error("Error cargando datos", e);
     }
 }
 
@@ -1977,3 +1972,4 @@ function exportarJSON() {
   a.click();
   document.body.removeChild(a);
 }
+
