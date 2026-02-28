@@ -1948,23 +1948,22 @@ document.addEventListener('DOMContentLoaded', init);
     reader.readAsText(file, 'utf-8');
   });
 
-  const btn = document.createElement('button');
-  btn.textContent = 'IMPORTAR JSON (TEST)';
-  btn.style.position = 'fixed';
-  btn.style.bottom = '20px';
-  btn.style.right = '20px';
-  btn.style.zIndex = '999999';
-  btn.style.padding = '10px 15px';
-  btn.style.borderRadius = '10px';
-  btn.style.border = 'none';
-  btn.style.background = '#10b981';
-  btn.style.color = '#fff';
-  btn.style.fontWeight = '700';
-  btn.style.cursor = 'pointer';
+// const btn = document.createElement('button');
+// btn.textContent = 'IMPORTAR JSON (TEST)';
+// btn.style.position = 'fixed';
+// btn.style.bottom = '20px';
+// btn.style.right = '20px';
+// btn.style.zIndex = '999999';
+// btn.style.padding = '10px 15px';
+// btn.style.borderRadius = '10px';
+// btn.style.border = 'none';
+// btn.style.background = '#10b981';
+// btn.style.color = '#fff';
+// btn.style.fontWeight = '700';
+// btn.style.cursor = 'pointer';
 
-  btn.addEventListener('click', () => hiddenInput.click());
-
-  document.body.appendChild(btn);
+// btn.addEventListener('click', () => hiddenInput.click());
+// document.body.appendChild(btn);
 })();
 
 function exportarJSON() {
@@ -1979,6 +1978,7 @@ function exportarJSON() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
 
 
 
