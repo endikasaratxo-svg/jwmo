@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity - Marbella Oeste</title>
+    <!-- CSS Link -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Google Fonts: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PDF.js for real PDF rendering & search -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+
+<body class="dark-mode">
+    <div class="app-layout">
+        <main class="content-area">
+            <header class="content-header" style="display: none;">
+                <!-- Hidden per user request to maximize space -->
+            </header>
+            <section id="viewport" class="viewport"></section>
+        </main>
+    </div>
+
+    <div id="sectionModal" class="section-modal">
+        <div class="modal-inner">
+            <div class="modal-header">
+                <h2 id="modalTitle">Sección</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-grid" id="modalGrid"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
