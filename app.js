@@ -25,33 +25,65 @@ function setupJsonImportTest() {
     };
     reader.readAsText(file, 'utf-8');
   });
+}
 
-  // Creamos un botón flotante de prueba para lanzar el input
-  const btn = document.createElement('button');
-  btn.textContent = 'IMPORTAR JSON (TEST)';
-  btn.style.position = 'fixed';
-  btn.style.bottom = '20px';
-  btn.style.right = '20px';
-  btn.style.zIndex = '999999';
-  btn.style.padding = '10px 15px';
-  btn.style.borderRadius = '10px';
-  btn.style.border = 'none';
-  btn.style.background = '#10b981';
-  btn.style.color = '#fff';
-  btn.style.fontWeight = '700';
-  btn.style.cursor = 'pointer';
+    // Creamos un botón flotante de prueba para lanzar el input
+    const btn = document.createElement('button');
+    btn.textContent = 'IMPORTAR JSON (TEST)';
+    btn.style.position = 'fixed';
+    btn.style.bottom = '20px';
+    btn.style.right = '20px';
+    btn.style.zIndex = '999999';
+    btn.style.padding = '10px 15px';
+    btn.style.borderRadius = '10px';
+    btn.style.border = 'none';
+    btn.style.background = '#10b981';
+    btn.style.color = '#fff';
+    btn.style.fontWeight = '700';
+    btn.style.cursor = 'pointer';
 
-  btn.addEventListener('click', () => {
-    hiddenInput.click();
-  });
+    btn.addEventListener('click', () => {
+        hiddenInput.click();
+    });
 
+    document.body.appendChild(btn);
+
+    function exportFullBackup() {
+  const dataStr = JSON.stringify(appData, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'jwmo-backup.json';
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+function setupJsonImportTest() {
+  // ... TU CÓDIGO ACTUAL ...
   document.body.appendChild(btn);
 }
 
-// Llama a esta función cuando la app haya cargado
-// window.addEventListener('DOMContentLoaded', setupJsonImportTest);
+// === EXPORTAR BACKUP JSON COMPLETO (TEST) ===
+function exportFullBackup() {
+  const dataStr = JSON.stringify(appData, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
 
-/**
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'jwmo-backup.json';
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+// Llama a estas funciones cuando la app haya cargado (SOLO PARA PRUEBAS)
+// window.addEventListener('DOMContentLoaded', setupJsonImportTest);
+// window.addEventListener('DOMContentLoaded', setupJsonExportTest);
+
+/*
  * Antigravity - Marbella Oeste Core Logic
  * Version 4.0 - Premium UI & Service Year Integration
  */
@@ -1964,6 +1996,4 @@ exportBtn.style.fontWeight = '700';
 exportBtn.style.cursor = 'pointer';
 exportBtn.onclick = exportarJSON;
 document.body.appendChild(exportBtn);
-
-
 
