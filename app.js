@@ -107,22 +107,25 @@ async function init() {
 
 async function loadBackupData() {
     try {
-        // Primero intentamos cargar tu copia guardada en el navegador
+        // 1. Intentamos cargar lo que tú hayas IMPORTADO manualmente (se guarda en la memoria del navegador)
         const savedData = localStorage.getItem('marbella_data_backup');
+        
         if (savedData) {
             appData = JSON.parse(savedData);
-            console.log("📦 Datos cargados desde copia de seguridad local");
+            console.log("📦 Datos cargados desde la memoria del navegador");
             applyBranding();
             determineCurrentServiceYear();
-            return;
+            return; // Si encontramos esto, ya no seguimos buscando
         }
 
-        // Si no hay copia, intentamos cargar el archivo por defecto
+        // 2. Si no hay nada en memoria, buscamos el archivo del servidor
         const response = await fetch('marbella_backup.json');
         if (response.ok) {
             appData = await response.json();
             applyBranding();
             determineCurrentServiceYear();
+        } else {
+            console.log("No hay archivo marbella_backup.json en el servidor.");
         }
     } catch (e) {
         console.error("❌ Error al cargar datos:", e);
@@ -1917,40 +1920,60 @@ document.addEventListener('DOMContentLoaded', init);
     reader.readAsText(file, 'utf-8');
   });
 
-// const btn = document.createElement('button');
-// btn.textContent = 'IMPORTAR JSON (TEST)';
-// btn.style.position = 'fixed';
-// btn.style.bottom = '20px';
-// btn.style.right = '20px';
-// btn.style.zIndex = '999999';
-// btn.style.padding = '10px 15px';
-// btn.style.borderRadius = '10px';
-// btn.style.border = 'none';
-// btn.style.background = '#10b981';
-// btn.style.color = '#fff';
-// btn.style.fontWeight = '700';
-// btn.style.cursor = 'pointer';
+// === SISTEMA DE COPIAS DE SEGURIDAD (LIMPIO) ===
 
-// btn.addEventListener('click', () => hiddenInput.click());
-// document.body.appendChild(btn);
-})();
+// 1. Función para importar el archivo JSON
+function setupJsonImportTest() {
+  let hiddenInput = document.getElementById('agImportJsonHidden');
+  if (!hiddenInput) {
+    hiddenInput = document.createElement('input');
+    hiddenInput.type = 'file';
+    hiddenInput.accept = '.json';
+    hiddenInput.style.display = 'none';
+    hiddenInput.id = 'agImportJsonHidden';
+    document.body.appendChild(hiddenInput);
+  }
 
+  hiddenInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const json = JSON.parse(ev.target.result);
+        // Guardamos en la memoria del navegador y en la variable de la app
+        localStorage.setItem('marbella_data_backup', JSON.stringify(json));
+        appData = json;
+        alert('✅ ¡Copia de seguridad cargada! La página se reiniciará.');
+        window.location.reload(); 
+      } catch (err) {
+        alert('❌ El archivo JSON no es válido.');
+      }
+    };
+    reader.readAsText(file, 'utf-8');
+  });
+  return hiddenInput;
+}
+
+// 2. Función para lanzar el selector (Conéctala a tu botón de la interfaz)
+function triggerImport() {
+    const input = setupJsonImportTest();
+    input.click();
+}
+
+// 3. Función para exportar tus datos reales
 function exportarJSON() {
-  const datos = JSON.stringify(localStorage, null, 2);
-  const blob = new Blob([datos], {type: 'application/json'});
+  if (!appData) {
+    alert("⚠️ No hay datos para exportar.");
+    return;
+  }
+  const dataStr = JSON.stringify(appData, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'jwmo-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  a.download = `marbella-backup-${new Date().toISOString().slice(0,10)}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(url);
 }
-
-
-
-
-
-
-
