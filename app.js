@@ -1934,14 +1934,11 @@ function exportarJSON() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `marbella-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.download = `marbella-backup.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(url);
 }
 
-} // <--- Esta llave cierra la función exportarJSON que tengas ahí arriba
-
-window.onload = init; // <--- Este es el interruptor que quita el azul
-
+// ESTO ES LO QUE QUITA EL AZUL Y ARRANCA TODO
+window.onload = init;
