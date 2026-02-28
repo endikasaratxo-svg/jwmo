@@ -1,46 +1,42 @@
-// === IMPORTAR BACKUP JSON (FUNCIONANDO DE VERDAD) ===
+// === IMPORTAR BACKUP JSON (CORREGIDO PARA GITHUB) ===
 function setupJsonImportTest() {
-  let hiddenInput = document.getElementById('agImportJsonHidden');
-  
-  // Si no existe el input, lo creamos
-  if (!hiddenInput) {
-    hiddenInput = document.createElement('input');
-    hiddenInput.type = 'file';
-    hiddenInput.accept = '.json';
-    hiddenInput.style.display = 'none';
-    hiddenInput.id = 'agImportJsonHidden';
-    document.body.appendChild(hiddenInput);
-  }
+    let hiddenInput = document.getElementById('agImportJsonHidden');
+    
+    if (!hiddenInput) {
+        hiddenInput = document.createElement('input');
+        hiddenInput.type = 'file';
+        hiddenInput.accept = '.json';
+        hiddenInput.style.display = 'none';
+        hiddenInput.id = 'agImportJsonHidden';
+        document.body.appendChild(hiddenInput);
+    }
 
-  hiddenInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    hiddenInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      try {
-        const json = JSON.parse(ev.target.result);
-        
-        // --- LA PARTE CLAVE: GUARDAR LOS DATOS ---
-        // 1. Lo guardamos en el localStorage (donde tu app guarda todo)
-        localStorage.setItem('marbella_data', JSON.stringify(json));
-        
-        // 2. Si usas otra clave de guardado, asegúrate de que sea la correcta
-        // Por ejemplo, si Antigravity usó 'appData', cambia lo de arriba por:
-        // localStorage.setItem('appData', JSON.stringify(json));
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const json = JSON.parse(ev.target.result);
+                
+                // GUARDAR LOS DATOS EN LA MEMORIA DEL NAVEGADOR
+                // Usamos 'marbella_backup_data' o el nombre que prefieras
+                localStorage.setItem('marbella_data_backup', JSON.stringify(json));
+                
+                // Actualizamos la variable en tiempo real
+                appData = json;
 
-        alert('¡Importación completada! La página se va a recargar para mostrar tus datos.');
-        
-        // 3. Recargamos la app para que lea los nuevos datos
-        window.location.reload();
+                alert('¡IMPORTACIÓN CORRECTA! Los datos de Marbella se han cargado. La página se reiniciará.');
+                window.location.reload();
 
-      } catch (err) {
-        console.error('Error al parsear JSON:', err);
-        alert('Archivo JSON no válido.');
-      }
-    };
-    reader.readAsText(file, 'utf-8');
-  });
+            } catch (err) {
+                console.error('Error al parsear JSON:', err);
+                alert('Archivo JSON no válido.');
+            }
+        };
+        reader.readAsText(file, 'utf-8');
+    });
 }
 
 // Esta función es la que debes llamar desde el botón de la web
@@ -93,18 +89,21 @@ function setupJsonImportTest() {
   document.body.appendChild(btn);
 }
 
-// === EXPORTAR BACKUP JSON COMPLETO (TEST) ===
+// === EXPORTAR BACKUP JSON COMPLETO ===
 function exportFullBackup() {
-  const dataStr = JSON.stringify(appData, null, 2);
-  const blob = new Blob([dataStr], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
+    if (!appData || Object.keys(appData.actualHours).length === 0) {
+        alert("No hay datos para exportar todavía.");
+        return;
+    }
+    const dataStr = JSON.stringify(appData, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
 
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'jwmo-backup.json';
-  a.click();
-
-  URL.revokeObjectURL(url);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `jwmo-backup-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 // Llama a estas funciones cuando la app haya cargado (SOLO PARA PRUEBAS)
@@ -173,18 +172,22 @@ async function init() {
 
 async function loadBackupData() {
     try {
+        const savedData = localStorage.getItem('marbella_data_backup');
+        if (savedData) {
+            appData = JSON.parse(savedData);
+            console.log("📦 Datos cargados desde LocalStorage");
+            applyBranding();
+            determineCurrentServiceYear();
+            return;
+        }
         const response = await fetch('marbella_backup.json');
         if (response.ok) {
             appData = await response.json();
-            console.log("📦 Data Loaded:", appData);
             applyBranding();
             determineCurrentServiceYear();
-        } else {
-            console.error("❌ Backup not found.");
-            appData = { branding: {}, actualHours: {}, plannedHours: {}, calendarNotes: {} };
         }
     } catch (e) {
-        console.error("❌ Init Error:", e);
+        console.error("❌ Error al cargar datos:", e);
     }
 }
 
@@ -2006,6 +2009,7 @@ function exportarJSON() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
 
 
 
