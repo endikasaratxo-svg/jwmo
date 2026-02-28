@@ -1,54 +1,3 @@
-// === IMPORTAR BACKUP JSON (CORREGIDO) ===
-function setupJsonImportTest() {
-  let hiddenInput = document.getElementById('agImportJsonHidden');
-  
-  if (!hiddenInput) {
-    hiddenInput = document.createElement('input');
-    hiddenInput.type = 'file';
-    hiddenInput.accept = '.json';
-    hiddenInput.style.display = 'none';
-    hiddenInput.id = 'agImportJsonHidden';
-    document.body.appendChild(hiddenInput);
-  }
-
-  hiddenInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      try {
-        const json = JSON.parse(ev.target.result);
-        
-        // GUARDAMOS EN LA MEMORIA DE LA APP (appData) Y EN EL NAVEGADOR (localStorage)
-        localStorage.setItem('marbella_data_backup', JSON.stringify(json));
-        appData = json;
-
-        alert('¡Copia de seguridad cargada con éxito! La página se reiniciará.');
-        window.location.reload(); 
-      } catch (err) {
-        console.error('Error al importar:', err);
-        alert('El archivo JSON no es válido.');
-      }
-    };
-    reader.readAsText(file, 'utf-8');
-  });
-}
-
-// Función para abrir el selector de archivos desde cualquier botón de tu menú
-function triggerImport() {
-    const input = document.getElementById('agImportJsonHidden') || setupJsonImportTest() || document.getElementById('agImportJsonHidden');
-    input.click();
-}
-
-// Llama a estas funciones cuando la app haya cargado (SOLO PARA PRUEBAS)
-// window.addEventListener('DOMContentLoaded', setupJsonImportTest);
-// window.addEventListener('DOMContentLoaded', setupJsonExportTest);
-
-/*
- * Antigravity - Marbella Oeste Core Logic
- * Version 4.0 - Premium UI & Service Year Integration
- */
 
 let appData = { branding: {}, actualHours: {}, plannedHours: {}, calendarNotes: {}, theme: {}, files: {} };
 let currentServiceYear = 2026; // Default/Current
@@ -1972,4 +1921,22 @@ function exportarJSON() {
   a.click();
   document.body.removeChild(a);
 }
+
+// ... (aquí termina tu última función original)
+
+function exportarJSON() {
+  if (!appData) return;
+  const dataStr = JSON.stringify(appData, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `marbella-backup.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// ESTO ES LO MÁS IMPORTANTE PARA QUE NO SALGA EN BLANCO:
+window.onload = init;
 
