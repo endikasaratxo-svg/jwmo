@@ -1941,6 +1941,7 @@ function exportarJSON() {
   URL.revokeObjectURL(url);
 }
 
-// ESTA LÍNEA ES LA QUE QUITA EL AZUL Y ENCIENDE LA APP
-window.onload = init;
+} // <--- Esta llave cierra la función exportarJSON que tengas ahí arriba
+
+window.onload = init; // <--- Este es el interruptor que quita el azul
 
