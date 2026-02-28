@@ -49,7 +49,7 @@ function setupJsonImportTest() {
 }
 
 // Llama a esta función cuando la app haya cargado
-window.addEventListener('DOMContentLoaded', setupJsonImportTest);
+// window.addEventListener('DOMContentLoaded', setupJsonImportTest);
 
 /**
  * Antigravity - Marbella Oeste Core Logic
@@ -1964,5 +1964,6 @@ exportBtn.style.fontWeight = '700';
 exportBtn.style.cursor = 'pointer';
 exportBtn.onclick = exportarJSON;
 document.body.appendChild(exportBtn);
+
 
 
