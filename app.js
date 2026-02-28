@@ -1,11 +1,16 @@
-// === IMPORTAR BACKUP JSON (BOTÓN GLOBAL) ===
+// === IMPORTAR BACKUP JSON (FUNCIONANDO DE VERDAD) ===
 function setupJsonImportTest() {
-  const hiddenInput = document.createElement('input');
-  hiddenInput.type = 'file';
-  hiddenInput.accept = '.json';
-  hiddenInput.style.display = 'none';
-  hiddenInput.id = 'agImportJsonHidden';
-  document.body.appendChild(hiddenInput);
+  let hiddenInput = document.getElementById('agImportJsonHidden');
+  
+  // Si no existe el input, lo creamos
+  if (!hiddenInput) {
+    hiddenInput = document.createElement('input');
+    hiddenInput.type = 'file';
+    hiddenInput.accept = '.json';
+    hiddenInput.style.display = 'none';
+    hiddenInput.id = 'agImportJsonHidden';
+    document.body.appendChild(hiddenInput);
+  }
 
   hiddenInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
@@ -15,9 +20,20 @@ function setupJsonImportTest() {
     reader.onload = (ev) => {
       try {
         const json = JSON.parse(ev.target.result);
-        console.log('JSON importado:', json);
-        // TODO: aquí restaurarás tu appData con ese json
-        alert('Backup JSON leído correctamente (mira la consola).');
+        
+        // --- LA PARTE CLAVE: GUARDAR LOS DATOS ---
+        // 1. Lo guardamos en el localStorage (donde tu app guarda todo)
+        localStorage.setItem('marbella_data', JSON.stringify(json));
+        
+        // 2. Si usas otra clave de guardado, asegúrate de que sea la correcta
+        // Por ejemplo, si Antigravity usó 'appData', cambia lo de arriba por:
+        // localStorage.setItem('appData', JSON.stringify(json));
+
+        alert('¡Importación completada! La página se va a recargar para mostrar tus datos.');
+        
+        // 3. Recargamos la app para que lea los nuevos datos
+        window.location.reload();
+
       } catch (err) {
         console.error('Error al parsear JSON:', err);
         alert('Archivo JSON no válido.');
@@ -25,6 +41,18 @@ function setupJsonImportTest() {
     };
     reader.readAsText(file, 'utf-8');
   });
+}
+
+// Esta función es la que debes llamar desde el botón de la web
+function triggerImport() {
+    const input = document.getElementById('agImportJsonHidden');
+    if (input) {
+        input.click();
+    } else {
+        // Si aún no se ha creado el input, lo creamos primero
+        setupJsonImportTest();
+        document.getElementById('agImportJsonHidden').click();
+    }
 }
 
     // Creamos un botón flotante de prueba para lanzar el input
@@ -1978,6 +2006,7 @@ function exportarJSON() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
 
 
 
