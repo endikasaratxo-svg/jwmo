@@ -1934,3 +1934,34 @@ document.addEventListener('DOMContentLoaded', init);
 
   document.body.appendChild(btn);
 })();
+
+function exportarJSON() {
+  const datos = JSON.stringify(localStorage, null, 2);
+  const blob = new Blob([datos], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'jwmo-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Botón export
+const exportBtn = document.createElement('button');
+exportBtn.textContent = 'EXPORTAR JSON (TEST)';
+exportBtn.style.position = 'fixed';
+exportBtn.style.bottom = '20px';
+exportBtn.style.left = '20px';
+exportBtn.style.zIndex = '999999';
+exportBtn.style.padding = '10px 15px';
+exportBtn.style.borderRadius = '10px';
+exportBtn.style.border = 'none';
+exportBtn.style.background = '#3b82f6';
+exportBtn.style.color = '#fff';
+exportBtn.style.fontWeight = '700';
+exportBtn.style.cursor = 'pointer';
+exportBtn.onclick = exportarJSON;
+document.body.appendChild(exportBtn);
+
