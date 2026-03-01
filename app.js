@@ -55,25 +55,19 @@ async function init() {
 }
 
 async function loadBackupData() {
-    try {
-        // Miramos si hay datos guardados por ti
-        const savedData = localStorage.getItem('marbella_data_backup');
-        if (savedData) {
-            appData = JSON.parse(savedData);
-            applyBranding();
-            determineCurrentServiceYear();
-            return;
-        }
-        // Si no, buscamos el archivo normal
-        const response = await fetch('marbella_backup.json');
-        if (response.ok) {
-            appData = await response.json();
-            applyBranding();
-            determineCurrentServiceYear();
-        }
-    } catch (e) {
-        console.error("Error cargando datos", e);
+  try {
+    const savedData = localStorage.getItem('marbella_data_backup');
+    if (savedData) {
+      appData = JSON.parse(savedData);
+      applyBranding();
+      determineCurrentServiceYear();
+      return;
     }
+    // Si no hay nada guardado, simplemente seguimos sin datos
+    console.log("No hay copia local de marbella_data_backup");
+  } catch (e) {
+    console.error("Error cargando datos", e);
+  }
 }
 
 function determineCurrentServiceYear() {
@@ -1248,8 +1242,12 @@ function renderBackupSection() {
                 <div style="text-align: center; border-right: 1px solid var(--glass-border); padding-right: 40px;">
                     <i class="fas fa-file-import" style="font-size: 4rem; color: var(--primary); margin-bottom: 25px;"></i>
                     <h3>Importar Datos</h3>
-                    <p style="margin: 15px 0; color: var(--text-dim);">Carga un archivo .json previamente descargado para restaurar tu información.</p>
-                    <button class="btn-primary" onclick="document.getElementById('agImportJsonHidden').click()" style="width: auto; padding: 15px 40px;">
+                    <p style="margin: 15px 0; color: var(--text-dim);">
+                        Carga un archivo .json previamente descargado para restaurar tu información.
+                    </p>
+                    <button class="btn-primary"
+                        onclick="triggerImport()"
+                        style="width: auto; padding: 15px 40px;">
                         SELECCIONAR ARCHIVO
                     </button>
                 </div>
@@ -1257,8 +1255,12 @@ function renderBackupSection() {
                 <div style="text-align: center; padding-left: 40px;">
                     <i class="fas fa-file-export" style="font-size: 4rem; color: var(--success); margin-bottom: 25px;"></i>
                     <h3>Exportar Datos</h3>
-                    <p style="margin: 15px 0; color: var(--text-dim);">Descarga una copia de seguridad de todos tus datos actuales en formato .json.</p>
-                    <button class="btn-primary" onclick="exportData()" style="width: auto; padding: 15px 40px; background: var(--success);">
+                    <p style="margin: 15px 0; color: var(--text-dim);">
+                        Descarga una copia de seguridad de todos tus datos actuales en formato .json.
+                    </p>
+                    <button class="btn-primary"
+                        onclick="exportarJSON()"
+                        style="width: auto; padding: 15px 40px; background: var(--success);">
                         DESCARGAR RESPALDO
                     </button>
                 </div>
@@ -1836,7 +1838,7 @@ function renderCalendarioAsignaciones() {
 // Boot
 document.addEventListener('DOMContentLoaded', init);
 
-/// === TEST BOTÓN IMPORTAR JSON ===
+/// === TEST BOTÓN  JSON ===
 (function () {
   const hiddenInput = document.createElement('input');
   hiddenInput.type = 'file';
@@ -1885,7 +1887,6 @@ function setupJsonImportTest() {
     reader.onload = (ev) => {
       try {
         const json = JSON.parse(ev.target.result);
-        // Guardamos en la memoria del navegador y en la variable de la app
         localStorage.setItem('marbella_data_backup', JSON.stringify(json));
         appData = json;
         alert('✅ ¡Copia de seguridad cargada! La página se reiniciará.');
@@ -1897,6 +1898,11 @@ function setupJsonImportTest() {
     reader.readAsText(file, 'utf-8');
   });
   return hiddenInput;
+}
+
+function triggerImport() {
+  const input = setupJsonImportTest();
+  input.click();
 }
 
 // 2. Función para lanzar el selector (Conéctala a tu botón de la interfaz)
@@ -1920,25 +1926,16 @@ function exportarJSON() {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 // ... (aquí termina tu última función original)
 
-function exportarJSON() {
-  if (!appData) {
-    alert("⚠️ No hay datos para exportar.");
-    return;
-  }
-  const dataStr = JSON.stringify(appData, null, 2);
-  const blob = new Blob([dataStr], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `marbella-backup.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
-
-// ESTO ES LO QUE QUITA EL AZUL Y ARRANCA TODO
+// ESTO ES LO MÁS IMPORTANTE PARA QUE NO SALGA EN BLANCO:
 window.onload = init;
+
+// HAZ VISIBLES LAS FUNCIONES PARA LOS onclick DEL HTML
+window.exportarJSON = exportarJSON;
+window.triggerImport = triggerImport;
+
+})();
